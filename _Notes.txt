@@ -1,0 +1,64 @@
+
+Need cleanup/removal of old entries
+
+==>Need test program that will call star name cleanup logic to test it
+	and report details about execution
+
+
+Enhancement: look into logic that tries to look up star coords from name; only partly working for now
+
+=================================================
+ASASSN catalog:		http://www.astronomy.ohio-state.edu/asassn/transients.html
+
+=================================================
+Web site:	https://sites.google.com/view/cba-summary
+
+=================================================
+CBA Summary project directory:	C:\Users\Joe\Documents\CBA_Summary\
+
++================================================
+Main script:		DownloadWebPage.py
+	
+Cron script to run:	CronForCBASummary.py
+
+=================================================
+Database:	SQLite
+	GUI for maintenance:	DB Browser for SQLite
+	Database:		CBA_Data.db
+Warning: if GUI has pending changes for DB, the summary script can't run.
+
+==================================================
+Maintenance task #1: fix bad star names
+
+The "Current_Stars" coords are erased by running DownloadWebPage.py
+
+Star name logic:
+---------------
++Does not fix "V598 pup"
++Does not fix "v382 vel, feb 15-16 // JD 8165.340 - 8165.558 (Berto Monard)"
+
++This did not parse all of name: MASTER OT J024850.29+401449.5 on February 16, 2018 ;
+ It only produced: MASTER OT
+
++It did not parse this at all:	OGLE-BLG-DN-0254, 9 Mar 2018 (8187.260-8187.400) (Greg Bolt)
+
++JD logic did not parse time from these:
+	AA Dor    171226    8114.0654 - 4.1528 (Peter Nelson)
+	BK Lyn JD 183.51765 (Damien Lemay)
+	DN Gem - 8156.7 (Bill Goff)
+	v382 vel, feb 7-8 // 8157.331-8157.565 (Berto Monard)
+	v382 vel, mar 3-4 // 8181.45-8181.58 (Berto Monard)
+	v382 vel, feb 25-26 // 8175.36-8175.62 (Berto Monard)
+	v382 vel, feb 21-22 // 8171.33-8171.54 (Berto Monard)
+
+
+TO TEST *STAR NAME* LOGIC:
+	TEST_CleaupStarNames.py into Pyscripter
+	In main(), edit line: test =   and put raw line to be tested here, then run this script
+
+
+To rerun *OBSERVATION TIME* LOGIC:
+	GetEventTimes.py	Run this directly; it will scan DB and rerun time parsing logic on all entries
+
+
+

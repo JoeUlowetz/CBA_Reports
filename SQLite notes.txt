@@ -1,0 +1,215 @@
+To run from DOS cmd prompt:	sqlite3
+to exit from it:  .exit
+
+To create a new database, or to open an existing DB when starting from DOS:  sqlite3 DATABASE.db
+to create a database named DATABASE
+
+If started sqlite3 without specifying database, to open/create DB:  .open DATABASE.db
+
+create table:
+> create table employees (id integer primary key, name text NOT NULL DEFAULT '0');
+> insert into employees(id,name) values (1,'name1');
+> insert into employees(name) values ('name2');
+
+create table field option:
+	field INTEGER UNIQUE CHECK(field > 10),
+
+create table as copy of another table:
+	create table Old_CBA_Data as select * from CBA_Data
+
+Add column after table created:  (no way to delete a column from a table)
+> ALTER TABLE tablename ADD COLUMN something TEXT;
+
+Rename table:
+> ALTER TABLE currenttablename RENAME TO newtablename;
+
+
+to clear screen:
+> .system cls
+
+> .mode column
+> .headers on
+> select * from employees;
+> .width 15 25
+> select * from employees;
+
+>.tables		(show tables in DB)
+
+.mode line
+
+> .schema
+> .schema employees	(for just one table) (shows the create cmd used to create the table)
+
+> select type, name, tbl_name, sql from sqlite_master order type;
+
+> .show		(show all current settings)
+
+> .dump		(dump contents of DB to screen, showing create and insert statements)
+
+> .output /path/to/file.sql
+> .dump			(dumps contents of DB to the file.sql)
+> .output stdout	(restores dump to screen)
+
+To delete a DATABASE, delete the file from the file system
+
+To remove a table from a database:
+> drop table employees;
+
+To recreate a database and repopulate it, after dumping its contents to file.sql:
+: sqlite3 NEWDATABASE.db
+> .read /path/to/file.sql	(this rebuilds tables and repopulates them per commands saved in file.sql)
+
+
+> .mode insert
+> select * from employees;
+The output here will be a series of INSERT statements that would repopulate the table.
+
+> .mode list		(normal setting for mode)
+
+To dump file contents as CSV file:
+> .mode csv
+> .output /path/to/file.csv
+> select * from employees;	(outputs table contents to file.csv)
+> .output stdout		(restore output to screen)
+
+> .mode html	(this would output in html format)
+
+====================================================
+Umlet:  a free plugin for Eclipse, or runs stand alone) for UML Diagrams
+(it is a drawing tool, not a modeling tool; there is no underlying dictionary) (use cases, actors, etc)
+
+====================================================
+
+create table w/ foreign key:
+
+> create table something(id integer primary key, somekey integer, foreign key(somekey) references othertable(id_other));
+assuming there is another table called othertable and it contains an integer primary key called id_other
+
+
+====================================================
+Rule:
+commands end w/ semicolon
+3 types of values: string literals ('), numeric literals, binary (hexadecimal)
+5 types: integers, real, text,blob, ?
+single line comments --
+multi line comments /*  */
+1 primary key
+sqllite IS CASE INSENSITIVE
+
+====================================================
+Query from a table (select): where clause: Note '=' single for testing.
+select * from table where field = 23;
+
+select * from table where field LIKE 'something%';
+select * from table where field LIKE 'something%A%';	followed by 'A'
+select * from table where field NOT LIKE 'something%';
+
+select * from table ORDER BY field DESC;	or ASC or nothing for ascending
+select * from table ORDER BY field LIMIT 10;	just first 10 results
+select * from table ORDER BY field OFFSET 2;	skip first 2 results
+select field as 'My Field Name' from table;	rename field on output
+
+UPDATE table SET field = 'newvalue' where id = 1;	change field value for some row
+
+SELECT DISTINCT field FROM table;
+
+DELETE FROM table WHERE id = 7;		delete a row
+
+DELETE FROM table;					delete all rows from the table
+
+Equals:  = or ==
+Not equals: <> or !=
+
+SELECT 'string' || 'other';		concat 2 strings for output
+
+SELECT * FROM table WHERE FIELD IN ('VALUE1','VALUE2','VALUE3');
+
+=============================================================
+Move row from one table to another:
+
+INSERT INTO Old_CBA_Data SELECT * FROM CBA_Data where id = 280;
+DELETE FROM CBA_Data where id = 280;
+
+select * from CBA_Data where dtEntry < "2018-02-02"
+INSERT INTO Old_CBA_Data SELECT * FROM CBA_Data where dtEntry < "2018-02-01"
+
+
+=============================================================
+
+GLOB:  similar to LIKE, case sensitive; like Unix
+SELECT * FROM table WHERE field GLOB '*something*';	use * instead of % in pattern
+
+SELECT * FROM table WHERE field BETWEEN 1 AND 10;
+
+SELECT random();
+
+SELECT ABS(RANDOM % 100);
+SELECT min(field1),max(field2) FROM table;
+SELECT LOWER(field3),UPPER(field4) FROM table;	lower and upper case outputs
+
+===========================================================
+Number of total changes made to a database:
+> SELECT total_changes();
+
+Number of rows in a table or result:
+SELECT COUNT(*) FROM table;
+
+SELECT date(),time(),datetime();
+
+Find date 30 days ago:
+SELECT date('now', '-30 days');
+
+Find date of next Sunday (=0) (Monday=1, etc):
+SELECT date('now', 'weekday 0');
+
+Modify format of date:
+SELECT strftime('%m-%d-%Y');
+
+=====================================================================
+
+SQLite is part of standard Python.
+
+import sqlite3
+
+conn = sqlite3.connect('filename.db')	will create db file if it doesn't already exist
+
+c = conn.cursor()		create cursor so we can execute commands
+c.execute("""CREATE TABLE something (		DOC STRING so can span multiple lines in prgm
+	firstcol TEXT,
+	secondcol TEXT,
+	value INTEGER) """
+
+c.execute("INSERT INTO something VALUES ('SOME','SOMEELSE', 123)" )		ASSUMES FIELD NAME ORDER
+conn.commit()	#Note using 'conn' here for connection, not 'c' for cursor
+
+c.execute("INSERT INTO something VALUES (?, ?, ?)", ( var1, var2, num3))	pass variables to insert statement; note values inside tuple
+
+another way, using dictionary:
+c.execute("INSERT INTO something VALUES (:firstcol, :secondcol, :value)", 
+	{'firstcol':var3, 'secondcol':var4, 'value':num6})
+
+
+c.execute("SELECT * FROM something WHERE firstcol = 'SOME'")
+x = c.fetchone()				OR c.fetchmany(5)  returns list, or c.fetchall() ANY REMAINING ROWS RETURNED AS A LIST
+print x    (fetchone result is a tuple for the fields in the row)
+conn.commit()			DON'T FORGET THIS STEP
+
+conn.close()
+
+=======================================================================
+=======================================================================
+=======================================================================
+
+Queries:
+
+select clean_star_name, observer_name, count(observer_name) 
+FROM CBA_Data
+GROUP BY clean_star_name, observer_name;
+***This lists stars, all the observers per star, and count per observer for submissions on that star
+
+select observer_name, clean_star_name, count(clean_star_name)
+FROM CBA_Data
+GROUP BY observer_name, clean_star_name;
+***This lists observers, the stars each observer submitted, and count per star per observer for submissions
+
+
